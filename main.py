@@ -4,53 +4,35 @@ app = Flask(__name__)
 app.config['DEBUG'] = True
 
 
+
 @app.route('/login', methods=['POST'])
 
-
-def user_id():
+def login():
+    error_msg = ''
     user_id = request.form['login_id']
-
-    error_msg = "Your ID  must be more than 3 letters, less than 20, and have no spaces"
-    
-    if user_id == '':
-        return error_msg
-    if len(user_id) > 20 or len(user_id) < 3: 
-        return error_msg 
-    if " " in user_id:
-        return error_msg
-    else:
-        return redirect("/welcome")
-    
-def password_login():
     user_password = request.form['password']
+    password_verify = request.form['verify']
+    
+    if user_id == '' or len(user_id) > 20 or len (user_id) < 3 or " " in user_id:
+        error_msg = "Your ID and Password must be more than 3 letters, less than 20, and have no spaces" 
+        return render_template('index.html', error=error_msg, user_id=user_id)
+    
+    if user_password == '' or len(user_password) > 20 or len(user_password) < 3 or ' ' in user_password:
+        pas_error = "Invalid password"
+        return render_template('index.html', pas_error=pas_error, user_id=user_id)
 
-    error_msg = "Password must be more than 3 letters, less than 20, and have no spaces"
+    if user_password != password_verify:
+        verify_error = "Your passwords must match"
+        return render_template('index.html', error_ver=verify_error, user_id=user_id)
 
-    if user_password == "":
-        return error_msg
-    if len(user_password) > 20 or len(user_password) < 3: 
-        return error_msg
-    if " " in user_password:
-        return error_msg
     else:
-        return redirect('/welcome')
-
-def password_verify():
-    verify_password = request.form['veryify']
-    og_password = request.form['password']
-
-    error_msg = "Your passwords must match!"
-
-    if verify_password != og_password:
-        return error_msg
-    else:
-        return redirect('/welcome')
+        return render_template("welcome.html", user_name=user_id)
 
 
 @app.route("/welcome")
 
 def welcome():
-    return render_template("welcome.html")
+    return render_template("welcome.html", user_name=user_id)
 
 
 @app.route('/')
